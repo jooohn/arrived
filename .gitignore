@@ -1,7 +1,6 @@
 logs
 target
 activator*
-/conf
 /.idea
 /.idea_modules
 /.classpath
