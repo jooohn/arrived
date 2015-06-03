@@ -1,6 +1,6 @@
-package models
+package domain.location
 
-case class Location(latitude: Double, longitude: Double)
+case class Location(latitude: BigDecimal, longitude: BigDecimal)
 
 object Location {
   var list: List[Location] = Nil
