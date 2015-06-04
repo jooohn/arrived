@@ -6,22 +6,21 @@ import play.api._
 import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import scala.concurrent._
+import scala.concurrent.duration._
+import serializer.location.LocationSerializer._
+import serializer.user.UserLocationSerializer._
 
 class LocationController extends Controller {
 
-  implicit val locationWrites: Writes[Location] = (
-    (JsPath \ "latitude").write[BigDecimal] and
-      (JsPath \ "longitude").write[BigDecimal]
-    )(unlift(Location.unapply))
-
-  implicit val locationReads: Reads[Location] = (
-    (JsPath \ "latitude").read[BigDecimal] and
-      (JsPath \ "longitude").read[BigDecimal]
-    )(Location.apply _)
+  // dummy value
+  val uid = 1
 
   def list = Action {
-    UserRepository.ofSlick.resolve(1).value match {
-      case user: User => Ok(Json.toJson(user.location))
+    val future = UserLocationRepository.build.resolve(uid)
+    Await.result(future, 5 seconds) match {
+      case Some(userLocation) =>
+        Ok(Json.toJson(userLocation))
       case _ => Ok
     }
   }
@@ -33,8 +32,23 @@ class LocationController extends Controller {
         BadRequest(Json.obj("status" -> "NG"))
       },
       location => {
-        Location.save(location)
-        Ok(Json.obj("status" -> "OK"))
+        val repository = UserLocationRepository.build
+        val before = Await.result(repository.resolve(uid), 5 seconds)
+        val ul = UserLocation.apply(uid, location)
+        Await.result(repository.store(ul), 5 seconds) match {
+          case Some(userLocation) => {
+            val beforeJson = before match {
+              case Some(b) => Json.toJson(b)
+              case _ => JsNull
+            }
+            val response = Json.obj(
+              "before" -> beforeJson,
+              "after" -> Json.toJson(userLocation)
+            )
+            Ok(response)
+          }
+          case _ => BadRequest
+        }
       }
     )
   }
