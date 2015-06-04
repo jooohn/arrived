@@ -1,6 +1,7 @@
 logs
 target
 activator*
+/.env
 /.idea
 /.idea_modules
 /.classpath

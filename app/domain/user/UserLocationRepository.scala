@@ -1,5 +1,7 @@
 package domain.user
 import domain.location._
+import play.api.db.DB
+import play.api.Play.current
 import slick.driver.PostgresDriver.api._
 import slick.lifted.ProvenShape
 import java.sql.Timestamp
@@ -19,7 +21,7 @@ object UserLocationRepository {
 private class UserLocationRepositoryImpl
   extends UserLocationRepository
 {
-  val db = Database.forConfig("postgres")
+  val db = Database.forDataSource(DB.getDataSource())
   val userLocations = TableQuery[UserLocationTable]
   // db.run(userLocations.schema.create).value
 
