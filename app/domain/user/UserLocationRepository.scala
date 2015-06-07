@@ -10,7 +10,7 @@ import scala.concurrent._
 
 trait UserLocationRepository {
   def resolve(uid: Int): Future[Option[UserLocation]]
-  def store(userLocation: UserLocation): Future[Option[UserLocation]]
+  def store(userLocation: UserLocation): Future[UserLocation]
 }
 
 object UserLocationRepository {
@@ -22,38 +22,32 @@ private class UserLocationRepositoryImpl
   extends UserLocationRepository
 {
   val db = Database.forDataSource(DB.getDataSource())
-  val userLocations = TableQuery[UserLocationTable]
-  // db.run(userLocations.schema.create).value
 
   def resolve(uid: Int): Future[Option[UserLocation]] = {
-    val query = userLocations.filter(_.uid === uid).take(1)
-    db.run(query.result) map { rows =>
-      rows.headOption map {
-        case (_, latitude, longitude, timestamp) =>
-          val location = new Location(latitude, longitude)
-          UserLocation.apply(uid, location, timestamp)
+    db.run(UserLocations.find(uid).result) map {
+      _.headOption map { row =>
+        val location = new Location(row.latitude, row.longitude)
+        UserLocation.apply(row.uid, location, row.updatedAt)
       }
     }
   }
 
   def store(userLocation: UserLocation):
-  Future[Option[UserLocation]] = {
-    val location = userLocation.location;
-    val query = userLocations
-      .insertOrUpdate((
-        userLocation.uid,
-        location.latitude,
-        location.longitude,
-        userLocation.updatedAt
-      ))
-    db.run(query) flatMap { _ =>
-      resolve(userLocation.uid)
+  Future[UserLocation] = {
+    db.run(UserLocations.save(userLocation)) map { _ =>
+      userLocation
     }
   }
 }
 
-private class UserLocationTable(tag: Tag)
-  extends Table[(Int, BigDecimal, BigDecimal, Timestamp)](tag, "user_location") {
+private case class UserLocationRow(
+  uid: Int,
+  latitude: BigDecimal,
+  longitude: BigDecimal,
+  updatedAt: Timestamp)
+
+private class UserLocations(tag: Tag)
+  extends Table[UserLocationRow](tag, "user_location") {
 
   // This is the primary key column:
   def uid = column[Int]("uid", O.PrimaryKey)
@@ -61,8 +55,20 @@ private class UserLocationTable(tag: Tag)
   def longitude = column[BigDecimal]("longitude")
   def updatedAt = column[Timestamp]("updated_at")
 
-  // Every table needs a * projection with the same type as the table's type parameter
-  def * = (uid, latitude, longitude, updatedAt)
+  def * = (uid, latitude, longitude, updatedAt) <>
+    (UserLocationRow.tupled, UserLocationRow.unapply)
+}
 
-  def ins = (uid, latitude, longitude, updatedAt)
+private object UserLocations extends TableQuery(new UserLocations(_)) {
+  def find(uid: Int) = filter(_.uid === uid).take(1)
+
+  def save(ul: UserLocation) = {
+    val row = UserLocationRow(
+      ul.uid,
+      ul.location.latitude,
+      ul.location.longitude,
+      ul.updatedAt
+    )
+    this.insertOrUpdate(row)
+  }
 }

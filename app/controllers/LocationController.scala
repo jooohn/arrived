@@ -1,6 +1,7 @@
 package controllers
 
 import domain.user._
+import domain.user.event._
 import domain.location._
 import play.api._
 import play.api.mvc._
@@ -35,22 +36,39 @@ class LocationController extends Controller {
         val repository = UserLocationRepository.build
         val before = Await.result(repository.resolve(uid), 5 seconds)
         val ul = UserLocation.apply(uid, location)
-        Await.result(repository.store(ul), 5 seconds) match {
-          case Some(userLocation) => {
-            val beforeJson = before match {
-              case Some(b) => Json.toJson(b)
-              case _ => JsNull
-            }
-            val response = Json.obj(
-              "before" -> beforeJson,
-              "after" -> Json.toJson(userLocation)
-            )
-            Ok(response)
-          }
-          case _ => BadRequest
-        }
+        val after = Await.result(repository.store(ul), 5 seconds)
+
+        // hook
+        val eventHooks = dummyEventHooks(uid)
+        EventHookService.apply.execute(
+          eventHooks,
+          before.map(_.location),
+          after.location
+        )
+
+        val response = Json.obj(
+          "before" -> (before match {
+            case Some(b) => Json.toJson(b)
+            case _ => JsNull
+          }),
+          "after" -> Json.toJson(after)
+        )
+        Ok(response)
       }
     )
   }
 
+  def dummyEventHooks(uid: Int): Set[EventHook] = {
+    val area = Area.apply(Location.apply(0.0, 0.0), 10.0)
+    val userArea = UserArea.apply(None, uid, "溜池山王", area)
+    val logAction = EventAction.apply(None, EventAction.ActionType.Log)
+    val mailAction = EventAction.apply(None, EventAction.ActionType.Mail)
+    EventHook.HookType.values.map { hookType =>
+      val actions = hookType match {
+        case EventHook.HookType.Entered => Set(logAction, mailAction)
+        case _ => Set(logAction)
+      }
+      EventHook.apply(None, uid, userArea, hookType, actions)
+    }
+  }
 }

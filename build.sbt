@@ -6,9 +6,11 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.11.1"
 
+val dispatchVar = "0.11.2"
 libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick" % "3.0.0",
   "org.postgresql" % "postgresql" % "9.3-1100-jdbc41",
+  "org.scalaj" %% "scalaj-http" % "1.1.4",
   jdbc,
   cache,
   ws,
