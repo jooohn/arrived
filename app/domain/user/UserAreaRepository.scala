@@ -9,7 +9,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
 
 trait UserAreaRepository {
-  def resolve(uid: Int): Future[Option[UserArea]]
+  def resolve(id: Int): Future[Option[UserArea]]
+  def list(uid: Int): Future[Seq[UserArea]]
   // def store(userArea: UserArea): Future[Option[UserArea]]
 }
 
@@ -35,7 +36,7 @@ private class UserAreaRepositoryImpl
     }
   }
 
-  def findByUid(uid: Int): Future[Seq[UserArea]] = {
+  def list(uid: Int): Future[Seq[UserArea]] = {
     db.run(UserAreas.findByUid(uid).result) map {
       _ map { row =>
         val location = Location.apply(row.latitude, row.longitude)
@@ -87,8 +88,11 @@ class UserAreas(tag: Tag)
 }
 
 object UserAreas extends TableQuery(new UserAreas(_)) {
-  val findByUid = this.findBy(_.uid)
   def find(id: Int) = filter(_.id === id).take(1)
+  // val findByUid = this.findBy(_.uid)
+  def findByUid(uid: Int) = {
+    this.filter(_.uid === uid)
+  }
   def insert(userArea: UserArea) = {
     val row = UserAreaRow(
       userArea.id,

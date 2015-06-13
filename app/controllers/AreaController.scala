@@ -8,13 +8,18 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.concurrent._
 import scala.concurrent.duration._
-import serializer.location.LocationSerializer._
-import serializer.user.UserLocationSerializer._
+import serializer.Serializers._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class AreaController extends Controller {
 
   // dummy value
   val uid = 1
+
+  def list = Action.async {
+    val future = UserAreaRepository.build.list(uid)
+    future.map { areas => Ok(Json.toJson(areas)) }
+  }
 
   def create = Action { request =>
     BadRequest("under construction")
