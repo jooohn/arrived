@@ -2,7 +2,6 @@ package controllers
 
 import domain.event.EventRepository
 import domain.user._
-import domain.user.event._
 import domain.location._
 import play.api._
 import play.api.mvc._
