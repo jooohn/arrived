@@ -1,5 +1,6 @@
 package controllers
 
+import domain.event.EventRepository
 import domain.user._
 import domain.user.event._
 import domain.location._
@@ -8,6 +9,7 @@ import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.concurrent._
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import serializer.location.LocationSerializer._
 import serializer.user.UserLocationSerializer._
@@ -39,12 +41,14 @@ class LocationController extends Controller {
         val after = Await.result(repository.store(ul), 5 seconds)
 
         // hook
-        val eventHooks = dummyEventHooks(uid)
-        EventHookService.apply.execute(
-          eventHooks,
-          before.map(_.location),
-          after.location
-        )
+        val eventRepository = EventRepository.build
+        eventRepository.findByUid(uid) map { events =>
+          events.filter(_.fit(before.map(_.location), after.location)).foreach { event =>
+            Future { event.invoke } onFailure {
+              case t => Logger.error("failed to execute event. (%s)".format(t.getMessage))
+            }
+          }
+        }
 
         val response = Json.obj(
           "before" -> (before match {
@@ -56,19 +60,5 @@ class LocationController extends Controller {
         Ok(response)
       }
     )
-  }
-
-  def dummyEventHooks(uid: Int): Set[EventHook] = {
-    val area = Area.apply(Location.apply(0.0, 0.0), 10.0)
-    val userArea = UserArea.apply(None, uid, "溜池山王", area)
-    val logAction = EventAction.apply(None, EventAction.ActionType.Log)
-    val mailAction = EventAction.apply(None, EventAction.ActionType.Mail)
-    EventHook.HookType.values.map { hookType =>
-      val actions = hookType match {
-        case EventHook.HookType.Entered => Set(logAction, mailAction)
-        case _ => Set(logAction)
-      }
-      EventHook.apply(None, uid, userArea, hookType, actions)
-    }
   }
 }

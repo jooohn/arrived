@@ -18,4 +18,6 @@ class ApplicationController extends Controller {
   def index = Action {
     Ok(views.html.index())
   }
+
+  def notFound(others: String) = index
 }

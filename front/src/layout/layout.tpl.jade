@@ -1,0 +1,13 @@
+#layout-layout
+  header.header
+    nav.navbar.navbar-inverse.navbar-embossed.navbar-fixed-top(role="navigation")
+      .container-fluid
+        .navbar-header
+          button.navbar-toggle(
+            type="button",
+            ng-click="layoutCtrl.navbarCollapsed = !layoutCtrl.navbarCollapsed")
+          a.navbar-brand(ui-sref="root.root") M3Hack-D
+        .collapse.navbar-collapse(collapse="layoutCtrl.navbarCollapsed")
+          ul.nav.navbar-nav
+            li(ui-sref-active="active"): a(ui-sref="root.areas") AREA
+  .container-fluid(ui-view)

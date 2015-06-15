@@ -11,7 +11,7 @@ import scala.concurrent._
 trait UserAreaRepository {
   def resolve(id: Int): Future[Option[UserArea]]
   def list(uid: Int): Future[Seq[UserArea]]
-  // def store(userArea: UserArea): Future[Option[UserArea]]
+  def create(userArea: UserArea): Future[UserArea]
 }
 
 object UserAreaRepository {
@@ -46,21 +46,11 @@ private class UserAreaRepositoryImpl
     }
   }
 
-  def store(userArea: UserArea): Future[UserArea] = {
-    userArea.id match {
-      case Some(id) => {
-        db.run(UserAreas.update(userArea)) map { _ =>
-          userArea
-        }
-      }
-      case _ => {
-        db.run(UserAreas.insert(userArea)) map { id =>
-          UserArea.apply(Some(id), userArea.uid, userArea.name, userArea.area)
-        }
-      }
+  def create(userArea: UserArea): Future[UserArea] = {
+    db.run(UserAreas.insert(userArea)) map { id =>
+      UserArea.apply(Some(id), userArea.uid, userArea.name, userArea.area)
     }
   }
-
 }
 
 case class UserAreaRow(

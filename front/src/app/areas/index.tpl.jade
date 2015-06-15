@@ -1,0 +1,16 @@
+.row
+  .col-sm-3
+    .form-group
+      a.btn.btn-primary.btn-block(ui-sref="root.areas.new")
+        span 新規作成
+    ul.list-group
+      a.list-group-item(
+        ng-repeat="area in indexCtrl.areas",
+        ui-sref-active="active",
+        ui-sref="root.areas.show({ id: area.id })")
+        h4.list-group-item-heading {{ area.name }}
+        p.list-group-item-text
+          span latitude: {{ area.area.location.latitude }}
+          span &nbsp;/&nbsp;
+          span longitude: {{ area.area.location.longitude }}
+  .col-sm-9(ui-view)

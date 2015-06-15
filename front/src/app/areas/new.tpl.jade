@@ -1,0 +1,29 @@
+h4 新規作成
+form.form-horizontal(ng-submit="newCtrl.register(newCtrl.area)")
+  .form-group
+    label.control-label.col-sm-3 名前
+    .col-sm-9
+      input.form-control(type="text", ng-model="newCtrl.area.name", required)
+  .form-group
+    label.control-label.col-sm-3 緯度
+    .col-sm-9
+      input.form-control(
+        type="number",
+        ng-model="newCtrl.area.area.location.latitude",
+        min="-180.0", max="180.0", step="any", required)
+  .form-group
+    label.control-label.col-sm-3 経度
+    .col-sm-9
+      input.form-control(
+        type="number",
+        ng-model="newCtrl.area.area.location.longitude",
+        min="-180.0", max="180.0", step="any", required)
+  .form-group
+    label.control-label.col-sm-3 距離
+    .col-sm-9
+      input.form-control(
+        type="number", ng-model="newCtrl.area.area.distance",
+        min="0.0", step="any", required)
+  .form-group
+    .col-sm-offset-3.col-sm-10
+      button.btn.btn-primary(type="submit") 登録

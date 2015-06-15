@@ -1,0 +1,35 @@
+h3 {{ showCtrl.area.name }}
+div {{ showCtrl.area }}
+div {{ showCtrl.newEvent }}
+h5 イベント追加
+form.form-horizontal(ng-submit="showCtrl.registerEvent(showCtrl.newEvent)")
+  .form-group
+    label.control-label.col-sm-2 Trigger
+    .col-sm-10
+      select.form-control(
+      ng-model="showCtrl.newEvent.triggerType"
+      ng-options="trigger.value as trigger.label for trigger in showCtrl.triggerTypes"
+      required)
+  .form-group
+    label.control-label.col-sm-2 Action
+    .col-sm-10
+      select.form-control(
+      ng-model="showCtrl.newEvent.actionType"
+      ng-options="action.value as action.label for action in showCtrl.actionTypes"
+      required)
+  .form-group
+    label.control-label.col-sm-2 Options
+    .col-sm-10
+      input.form-control(type="text", ng-model="showCtrl.newEvent.options")
+  .form-group
+    .col-sm-offset-2.col-sm-10
+      button.btn.btn-primary(type="submit") Register
+table.table
+  thead: tr
+    td Trigger
+    td Action
+    td Options
+  tbody: tr(ng-repeat="event in showCtrl.events")
+    td {{ showCtrl.labelByTriggerType(event.triggerType) }}
+    td {{ showCtrl.actionByActionType(event.actionType) }}
+    td {{ event.options }}

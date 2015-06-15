@@ -10,7 +10,7 @@ CREATE TABLE user_area (
     longitude numeric(21, 2) NOT NULL,
     distance numeric(21, 2) NOT NULL
 );
-CREATE INDEX key_01 ON user_area (uid)
+CREATE INDEX user_area__uid ON user_area (uid);
 
 # --- !Downs
 

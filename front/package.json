@@ -1,0 +1,16 @@
+{
+  "name": "m3hack-d-core",
+  "description": "the core api of M3-hack D team",
+  "devDependencies": {
+    "browserify": "*",
+    "babelify": "*",
+    "vinyl-source-stream": "*",
+    "gulp-watch": "*",
+    "gulp-sourcemaps": "*",
+    "gulp-concat": "*",
+    "gulp-jade": "*",
+    "gulp-sass": "*",
+    "gulp-babel": "*",
+    "gulp-angular-templatecache": "*"
+  }
+}

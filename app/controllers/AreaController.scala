@@ -21,8 +21,24 @@ class AreaController extends Controller {
     future.map { areas => Ok(Json.toJson(areas)) }
   }
 
-  def create = Action { request =>
-    BadRequest("under construction")
+  def show(id: Int) = Action.async {
+    val future = UserAreaRepository.build.resolve(id)
+    future.map { area => Ok(Json.toJson(area)) }
+  }
+
+  def create = Action.async(BodyParsers.parse.json) { request =>
+    implicit val userAreaReads = buildUserAreaReads(uid)
+    val userAreaResult = request.body.validate[UserArea]
+    userAreaResult.fold(
+      errors => {
+        Future { BadRequest(Json.obj("status" -> "NG")) }
+      },
+      userArea => {
+        UserAreaRepository.build.create(userArea).map { created =>
+          Ok(Json.toJson(created))
+        }
+      }
+    )
   }
 
   def update = Action(BodyParsers.parse.json) { request =>

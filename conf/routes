@@ -3,13 +3,22 @@
 # ~~~~
 
 # index
-GET     /       controllers.ApplicationController.index
+GET         /                     controllers.ApplicationController.index
 
 # location
-GET     /location            controllers.LocationController.list
-POST    /location            controllers.LocationController.update
-PUT     /location            controllers.LocationController.update
+GET         /api/location         controllers.LocationController.list
+POST        /api/location         controllers.LocationController.update
+PUT         /api/location         controllers.LocationController.update
 # area
-GET     /areas               controllers.AreaController.list
+GET         /api/areas            controllers.AreaController.list
+GET         /api/areas/:id        controllers.AreaController.show(id: Int)
+POST        /api/areas            controllers.AreaController.create
+
+# event
+GET         /api/areas/:areaId/events   controllers.EventController.list(areaId: Int)
+POST        /api/areas/:areaId/events   controllers.EventController.create(areaId: Int)
+
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file        controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file         controllers.Assets.versioned(path="/public", file: Asset)
+
+GET         /*others              controllers.ApplicationController.notFound(others)

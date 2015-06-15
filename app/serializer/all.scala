@@ -3,6 +3,7 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import domain.location._
 import domain.user._
+import domain.event._
 
 object Serializers {
   implicit val locationWrites: Writes[Location] = (
@@ -35,10 +36,40 @@ object Serializers {
     Some((ul.uid, ul.location, ul.updatedAt.getTime))
 
   implicit val UserAreaWrites: Writes[UserArea] = (
-    (JsPath \ "uid").write[Int] and
+    (JsPath \ "id").write[Option[Int]] and
+      (JsPath \ "uid").write[Int] and
       (JsPath \ "name").write[String] and
       (JsPath \ "area").write[Area]
     )(unlift(unapplyUserArea))
 
-  private def unapplyUserArea(ua: UserArea) = Some(ua.uid, ua.name, ua.area)
+  def buildUserAreaReads(uid: Int): Reads[UserArea] = {
+    ((JsPath \ "name").read[String] and
+      (JsPath \ "area").read[Area]
+    )((name, area) => UserArea.apply(None, uid, name, area))
+  }
+
+  implicit val EventWrites: Writes[Event] = (
+    (JsPath \ "id").write[Option[Int]] and
+      (JsPath \ "userArea").write[UserArea] and
+      (JsPath \ "triggerType").write[Int] and
+      (JsPath \ "actionType").write[Int] and
+      (JsPath \ "options").write[String]
+    )(unlift((event: Event) => Some(event.id, event.userArea, event.triggerType.id, event.actionType.id, event.options)))
+
+  def buildEventReads(userArea: UserArea): Reads[Event] = {
+    ((JsPath \ "triggerType").read[Int] and
+      (JsPath \ "actionType").read[Int] and
+      (JsPath \ "options").read[String]
+      )((triggerType, actionType, options) => {
+      Event.apply(
+        None,
+        userArea,
+        Event.TriggerType(triggerType),
+        Event.ActionType(actionType),
+        options
+      )})
+  }
+
+
+  private def unapplyUserArea(ua: UserArea) = Some(ua.id, ua.uid, ua.name, ua.area)
 }

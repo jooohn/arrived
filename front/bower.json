@@ -1,0 +1,12 @@
+{
+  "name": "m3hack-d-core",
+  "devDependencies": {
+    "jquery": "*",
+    "angular": "*",
+    "angular-resource": "*",
+    "angular-ui-router": "*",
+    "angular-animate": "*",
+    "angular-bootstrap": "*",
+    "flat-ui": "*"
+  }
+}
