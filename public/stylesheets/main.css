@@ -2,5 +2,8 @@ html,
 body {
   margin: 0px; }
 
+.google-map-container {
+  height: 400px; }
+
 #layout-layout {
   padding-top: 60px; }

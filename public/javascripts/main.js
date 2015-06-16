@@ -77,7 +77,7 @@ var ShowController = (function () {
 
     // TODO should get from Server
     this.triggerTypes = [{ value: 1, label: '入ったら' }, { value: 2, label: '留まっていたら' }, { value: 3, label: '離れたら' }, { value: 4, label: 'いなかったら' }];
-    this.actionTypes = [{ value: 1, label: 'サーバーにログを吐く' }, { value: 2, label: 'Slackに通知をする' }];
+    this.actionTypes = [{ value: 1, label: 'サーバーにログを吐く' }, { value: 2, label: 'Slackに通知をする' }, { value: 3, label: 'メールを送る' }, { value: 4, label: 'Twitterでつぶやく' }, { value: 5, label: 'しゃべる' }];
     this._newEvent();
   }
 

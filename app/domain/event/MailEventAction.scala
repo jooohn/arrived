@@ -4,7 +4,7 @@ import play.Logger
 import play.api.libs.json._
 import Event.TriggerType._
 
-protected class SlackEventAction(event: Event) extends EventAction(event) {
+protected class MailEventAction(event: Event) extends EventAction(event) {
   val triggerType = event.triggerType
   val userArea = event.userArea
   val options = event.options
@@ -13,7 +13,7 @@ protected class SlackEventAction(event: Event) extends EventAction(event) {
   def validate(event: Event) = Unit
   def invoke = {
     val request = Http(endpoint)
-      .param("type", "slack")
+      .param("type", "mail")
       .param("message", options)
     //   .postData(Json.obj("message" -> options).toString())
     //   .header("content-type", "application/json")

@@ -1,6 +1,11 @@
 h3 {{ showCtrl.area.name }}
-div {{ showCtrl.area }}
-div {{ showCtrl.newEvent }}
+dl.dl-horizontal
+  dt 緯度
+  dd {{ showCtrl.area.area.location.latitude }}
+  dt 経度
+  dd {{ showCtrl.area.area.location.longitude }}
+  dt 距離
+  dd {{ showCtrl.area.area.distance }}
 h5 イベント追加
 form.form-horizontal(ng-submit="showCtrl.registerEvent(showCtrl.newEvent)")
   .form-group

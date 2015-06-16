@@ -16,6 +16,9 @@ export default class ShowController {
     this.actionTypes = [
       { value: 1, label: 'サーバーにログを吐く' },
       { value: 2, label: 'Slackに通知をする' },
+      { value: 3, label: 'メールを送る' },
+      { value: 4, label: 'Twitterでつぶやく' },
+      { value: 5, label: 'しゃべる' }
     ];
     this._newEvent();
 

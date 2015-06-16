@@ -45,6 +45,9 @@ object Event {
   object ActionType extends Enumeration {
     val Log = Value(1)
     val Slack = Value(2)
+    val Mail = Value(3)
+    val Twitter = Value(4)
+    val Voice = Value(5)
   }
 }
 
@@ -58,6 +61,9 @@ private case class EventImpl(
   val action: EventAction = actionType match {
     case Event.ActionType.Log => new LogEventAction(this)
     case Event.ActionType.Slack => new SlackEventAction(this)
+    case Event.ActionType.Mail => new MailEventAction(this)
+    case Event.ActionType.Twitter => new TwitterEventAction(this)
+    case Event.ActionType.Voice => new VoiceEventAction(this)
   }
 
   def fit(previous: Option[Location], current: Location) = {
